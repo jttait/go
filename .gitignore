@@ -41,4 +41,15 @@ ch3/comma/comma
 ch3/printints/printints
 ch3/ex3-10/comma
 ch3/ex3-11/comma
-ch3ex3-12/anagrams
+ch3/ex3-12/anagrams
+ch4/ex4-2/ex4-2
+ch4/rev/rev
+ch4/append/append
+ch4/nonempty/nonempty
+ch4/freq/freq
+ch4/issues/issues
+ch4/ex4-10/issues
+ch4/ex4-11/issue
+ch4/ex4-12/xkcd
+ch4/ex4-12/comics/**
+ch4/autoescape/autoescape
