@@ -48,8 +48,12 @@ ch4/append/append
 ch4/nonempty/nonempty
 ch4/freq/freq
 ch4/issues/issues
+ch4/ex4-9/freq
 ch4/ex4-10/issues
-ch4/ex4-11/issue
+ch4/ex4-11/issues
 ch4/ex4-12/xkcd
 ch4/ex4-12/comics/**
 ch4/autoescape/autoescape
+ch4/issuereport/issuereport
+ch4/issueshtml/issueshtml
+ch4/ex4-14/ex4-14
