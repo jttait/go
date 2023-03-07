@@ -1,0 +1,1 @@
+OMDb Poster API is only available to patrons.
