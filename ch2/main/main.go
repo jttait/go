@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"example.com/popcount"
+	"github.com/jttait/gopl.io/ch2/popcount"
 )
 
 func main() {
