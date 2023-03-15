@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"example.com/tempconv"
+	"github.com/jttait/gopl.io/ch2/tempconv"
 )
 
 func main() {

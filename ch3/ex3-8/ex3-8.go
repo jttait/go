@@ -2,9 +2,10 @@ package main
 
 import (
 	"os"
-	"example.com/fractals"
 	"image"
 	"image/png"
+
+	"github.com/jttait/gopl.io/ch3/fractals"
 )
 
 func main() {

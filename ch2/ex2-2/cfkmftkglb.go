@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"example.com/convert"
+	"github.com/jttait/gopl.io/ch2/convert"
 )
 
 func main() {
