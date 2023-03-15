@@ -1,0 +1,3 @@
+Q: Explain why the help message contains the degree symbol when the default value
+   of 20.0 does not.
+A: The type is Celsius so it uses the String() method for that type.
