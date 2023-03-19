@@ -2,7 +2,7 @@ module gopl.io/findlinks
 
 go 1.20
 
-replace github.com/jttait/gopl.io/ch5/links => ../links
+replace github.com/jttait/gopl.io/ch5/links => ../../ch5/links
 
 require (
 	github.com/jttait/gopl.io/ch5/links v0.0.0-20230315074324-644abc4c54f7 // indirect

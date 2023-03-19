@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"gopl.io/ch5/links"
+	"github.com/jttait/gopl.io/ch5/links"
 )
 
 func breadthFirst(f func(item string) [] string, worklist []string) {

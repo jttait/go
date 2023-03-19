@@ -1,4 +1,4 @@
-module gopl.io/ch5/links
+module github.com/jttait/gopl.io/ch5/links
 
 go 1.20
 
