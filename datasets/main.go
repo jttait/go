@@ -8,34 +8,36 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/jttait/go/datasets/dateparser"
 )
 
 func main() {
 	UKCPIURL := "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23"
 	downloadCSV(UKCPIURL, "raw_data/ONS_UK_Consumer_Price_Index")
-	UKCPIs := convertToRecords("raw_data/ONS_UK_Consumer_Price_Index", 0, 1, 186, convertONSDate)
+	UKCPIs := convertToRecords("raw_data/ONS_UK_Consumer_Price_Index", 0, 1, 186)
 	writeRecordsToCSV(UKCPIs, "records/UK_Consumer_Price_Index")
 
 	downloadCSV(landRegistryURL("united-kingdom"), "raw_data/Land_Registry_Nominal_UK_Average_House_Prices")
-	nominalUKPrices := convertToRecords("raw_data/Land_Registry_Nominal_UK_Average_House_Prices", 3, 6, 1, convertLandRegistryDate)
+	nominalUKPrices := convertToRecords("raw_data/Land_Registry_Nominal_UK_Average_House_Prices", 3, 6, 1)
 	writeRecordsToCSV(nominalUKPrices, "records/Nominal_UK_Average_House_Prices")
 	realUKPrices := adjustForInflation(nominalUKPrices, UKCPIs)
 	writeRecordsToCSV(realUKPrices, "records/Real_UK_Average_House_Prices")
 
 	downloadCSV(landRegistryURL("city-of-aberdeen"), "raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices")
-	nominalAberdeenPrices := convertToRecords("raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices", 3, 6, 1, convertLandRegistryDate)
+	nominalAberdeenPrices := convertToRecords("raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices", 3, 6, 1)
 	writeRecordsToCSV(nominalAberdeenPrices, "records/Nominal_Aberdeen_Average_House_Prices")
 	realAberdeenPrices := adjustForInflation(nominalAberdeenPrices, UKCPIs)
 	writeRecordsToCSV(realAberdeenPrices, "records/Real_Aberdeen_Average_House_Prices")
 
 	downloadCSV(landRegistryURL("shetland-islands"), "raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices")
-	nominalShetlandPrices := convertToRecords("raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices", 3, 6, 1, convertLandRegistryDate)
+	nominalShetlandPrices := convertToRecords("raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices", 3, 6, 1)
 	writeRecordsToCSV(nominalShetlandPrices, "records/Nominal_Shetland_Average_House_Prices")
 	realShetlandPrices := adjustForInflation(nominalShetlandPrices, UKCPIs)
 	writeRecordsToCSV(realShetlandPrices, "records/Real_Shetland_Average_House_Prices")
 
 	downloadCSV(landRegistryURL("london"), "raw_data/Land_Registry_Nominal_London_Average_House_Prices")
-	nominalLondonPrices := convertToRecords("raw_data/Land_Registry_Nominal_London_Average_House_Prices", 3, 6, 1, convertLandRegistryDate)
+	nominalLondonPrices := convertToRecords("raw_data/Land_Registry_Nominal_London_Average_House_Prices", 3, 6, 1)
 	writeRecordsToCSV(nominalLondonPrices, "records/Nominal_London_Average_House_Prices")
 	realLondonPrices := adjustForInflation(nominalLondonPrices, UKCPIs)
 	writeRecordsToCSV(realLondonPrices, "records/Real_London_Average_House_Prices")
@@ -67,7 +69,7 @@ func downloadCSV(URL string, filename string) {
 	defer file.Close()
 }
 
-func convertToRecords(filename string, dateColumn int, valueColumn int, numHeaderRows int, dateConversionFunc func(string) (time.Time, error)) []Record {
+func convertToRecords(filename string, dateColumn int, valueColumn int, numHeaderRows int) []Record {
 	f, err := os.Open(filename + ".csv")
 	if err != nil {
 		log.Fatal(err)
@@ -84,7 +86,7 @@ func convertToRecords(filename string, dateColumn int, valueColumn int, numHeade
 		var num float64
 		for j, field := range data[i] {
 			if j == dateColumn {
-				start, err = dateConversionFunc(field)
+				start, err = dateparser.ParseDate(field)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -101,25 +103,6 @@ func convertToRecords(filename string, dateColumn int, valueColumn int, numHeade
 		}
 	}
 	return records
-}
-
-func convertLandRegistryDate(field string) (time.Time, error) {
-	start, err := time.Parse("2006-01-02", field+"-01")
-	if err != nil {
-		return time.Time{}, nil
-	}
-	return start, nil
-}
-
-func convertONSDate(field string) (time.Time, error) {
-	monthString := field[len(field)-3:]
-	monthToInteger := map[string]string{"JAN": "01", "FEB": "02", "MAR": "03", "APR": "04", "MAY": "05", "JUN": "06", "JUL": "07", "AUG": "08", "SEP": "09", "OCT": "10", "NOV": "11", "DEC": "12"}
-	field = field[:len(field)-4] + "-" + monthToInteger[monthString] + "-01"
-	start, err := time.Parse("2006-01-02", field)
-	if err != nil {
-		return time.Time{}, nil
-	}
-	return start, nil
 }
 
 func writeRecordsToCSV(records []Record, filename string) {
