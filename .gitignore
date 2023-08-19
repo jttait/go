@@ -98,3 +98,5 @@ kernighan_and_donovan/ch10/jpeg/jpeg
 kernighan_and_donovan/ch10/ex10-1/jpeg
 kernighan_and_donovan/ch10/ex10-2/archiver
 kernighan_and_donovan/ch10/jpeg/jpeg
+datasets/raw_data/*
+datasets/records/*
