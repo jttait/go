@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -41,7 +42,6 @@ func main() {
 	writeRecordsToCSV(nominalLondonPrices, "records/Nominal_London_Average_House_Prices")
 	realLondonPrices := adjustForInflation(nominalLondonPrices, UKCPIs)
 	writeRecordsToCSV(realLondonPrices, "records/Real_London_Average_House_Prices")
-
 }
 
 type Record struct {
@@ -120,44 +120,54 @@ func writeRecordsToCSV(records []Record, filename string) {
 	}
 }
 
-func adjustForInflation(nominalRecords []Record, CPIRecords []Record) []Record {
-	startDate := nominalRecords[0].Date
-	if CPIRecords[0].Date.After(startDate) {
-		startDate = CPIRecords[0].Date
+func earliestDateThatIsInBothRecords(a []Record, b []Record) time.Time {
+	date := a[0].Date
+	if b[0].Date.After(date) {
+		date = b[0].Date
 	}
-	endDate := nominalRecords[len(nominalRecords)-1].Date
-	if CPIRecords[len(CPIRecords)-1].Date.Before(endDate) {
-		endDate = CPIRecords[len(CPIRecords)-1].Date
-	}
-	var startNominal int
-	var endNominal int
-	for i := 0; i < len(nominalRecords); i++ {
-		if nominalRecords[i].Date.Equal(startDate) {
-			startNominal = i
-		}
-		if nominalRecords[i].Date.Equal(endDate) {
-			endNominal = i
-		}
-	}
-	var startCPI int
-	var endCPI int
-	for i := 0; i < len(CPIRecords); i++ {
-		if CPIRecords[i].Date.Equal(startDate) {
-			startCPI = i
-		}
-		if CPIRecords[i].Date.Equal(endDate) {
-			endCPI = i
-		}
-	}
+	return date
+}
 
-	var realRecords []Record
-	currentNominal := startNominal
-	currentCPI := startCPI
-	for currentNominal <= endNominal && currentCPI <= endCPI {
-		if nominalRecords[currentNominal].Date.After(startDate) && nominalRecords[currentNominal].Date.Before(endDate) {
-			realValue := nominalRecords[currentNominal].Value * (CPIRecords[len(CPIRecords)-1].Value / CPIRecords[currentCPI].Value)
-			realRecords = append(realRecords, Record{nominalRecords[currentNominal].Date, realValue})
+func latestDateThatIsInBothRecords(a []Record, b []Record) time.Time {
+	date := a[len(a)-1].Date
+	if b[len(b)-1].Date.Before(date) {
+		date = b[len(b)-1].Date
+	}
+	return date
+}
+
+func indexForDate(records []Record, date time.Time) (int, error) {
+	for index, record := range records {
+		if record.Date.Equal(date) {
+			return index, nil
 		}
+	}
+	return 0, fmt.Errorf("Date is not in records")
+}
+
+func adjustForInflation(nominalRecords []Record, CPIRecords []Record) []Record {
+	startDate := earliestDateThatIsInBothRecords(nominalRecords, CPIRecords)
+	endDate := latestDateThatIsInBothRecords(nominalRecords, CPIRecords)
+	currentNominal, err := indexForDate(nominalRecords, startDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	endNominal, err := indexForDate(nominalRecords, endDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	currentCPI, err := indexForDate(CPIRecords, startDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	endCPI, err := indexForDate(CPIRecords, endDate)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var realRecords []Record
+	for currentNominal <= endNominal && currentCPI <= endCPI {
+		realValue := nominalRecords[currentNominal].Value * (CPIRecords[len(CPIRecords)-1].Value / CPIRecords[currentCPI].Value)
+		realRecords = append(realRecords, Record{nominalRecords[currentNominal].Date, realValue})
 		currentNominal++
 		currentCPI++
 	}
