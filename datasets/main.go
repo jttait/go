@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -17,58 +16,53 @@ import (
 )
 
 func main() {
-	//UKCPIURL := "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23"
-	//downloadCSV(UKCPIURL, "raw_data/ONS_UK_Consumer_Price_Index")
-	//UKCPIs, err := convertToRecords("raw_data/ONS_UK_Consumer_Price_Index", 0, 1, 186)
-	//if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	UKCPIs = interpolateRecords(UKCPIs)
-	//	writeRecordsToCSV(UKCPIs, "records/UK_Consumer_Price_Index")
+	UKCPIURL := "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23"
+	UKCPIs, err := downloadCSVAndConvertToRecords(UKCPIURL, 0, 1, 186)
+	if err != nil {
+		log.Fatal(err)
+	}
+	UKCPIs = interpolateRecords(UKCPIs)
+	writeRecordsToCSV(UKCPIs, "records/UK_Consumer_Price_Index")
 
-	//downloadCSV(landRegistryURL("united-kingdom"), "raw_data/Land_Registry_Nominal_UK_Average_House_Prices")
-	//nominalUKPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_UK_Average_House_Prices", 3, 6, 1)
-	//if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	nominalUKPrices = interpolateRecords(nominalUKPrices)
-	//	writeRecordsToCSV(nominalUKPrices, "records/Nominal_UK_Average_House_Prices")
-	//	realUKPrices := adjustForInflation(nominalUKPrices, UKCPIs)
-	//	writeRecordsToCSV(realUKPrices, "records/Real_UK_Average_House_Prices")
+	records, err := downloadCSVAndConvertToRecords(landRegistryURL("united-kingdom"), 3, 6, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	records = interpolateRecords(records)
+	writeRecordsToCSV(records, "records/Nominal_UK_Average_House_Prices")
+	records = adjustForInflation(records, UKCPIs)
+	writeRecordsToCSV(records, "records/Real_UK_Average_House_Prices")
 
-	//downloadCSV(landRegistryURL("city-of-aberdeen"), "raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices")
-	//nominalAberdeenPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices", 3, 6, 1)
-	//if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	nominalAberdeenPrices = interpolateRecords(nominalAberdeenPrices)
-	//	writeRecordsToCSV(nominalAberdeenPrices, "records/Nominal_Aberdeen_Average_House_Prices")
-	//	realAberdeenPrices := adjustForInflation(nominalAberdeenPrices, UKCPIs)
-	//	writeRecordsToCSV(realAberdeenPrices, "records/Real_Aberdeen_Average_House_Prices")
+	records, err = downloadCSVAndConvertToRecords(landRegistryURL("city-of-aberdeen"), 3, 6, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	records = interpolateRecords(records)
+	writeRecordsToCSV(records, "records/Nominal_Aberdeen_Average_House_Prices")
+	records = adjustForInflation(records, UKCPIs)
+	writeRecordsToCSV(records, "records/Real_Aberdeen_Average_House_Prices")
 
-	//	downloadCSV(landRegistryURL("shetland-islands"), "raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices")
-	//	nominalShetlandPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices", 3, 6, 1)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	nominalShetlandPrices = interpolateRecords(nominalShetlandPrices)
-	//	writeRecordsToCSV(nominalShetlandPrices, "records/Nominal_Shetland_Average_House_Prices")
-	//	realShetlandPrices := adjustForInflation(nominalShetlandPrices, UKCPIs)
-	//	writeRecordsToCSV(realShetlandPrices, "records/Real_Shetland_Average_House_Prices")
+	records, err = downloadCSVAndConvertToRecords(landRegistryURL("shetland-islands"), 3, 6, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	records = interpolateRecords(records)
+	writeRecordsToCSV(records, "records/Nominal_Shetland_Average_House_Prices")
+	records = adjustForInflation(records, UKCPIs)
+	writeRecordsToCSV(records, "records/Real_Shetland_Average_House_Prices")
 
-	//	downloadCSV(landRegistryURL("london"), "raw_data/Land_Registry_Nominal_London_Average_House_Prices")
-	//	nominalLondonPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_London_Average_House_Prices", 3, 6, 1)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	nominalLondonPrices = interpolateRecords(nominalLondonPrices)
-	//	writeRecordsToCSV(nominalLondonPrices, "records/Nominal_London_Average_House_Prices")
-	//	realLondonPrices := adjustForInflation(nominalLondonPrices, UKCPIs)
-	//	writeRecordsToCSV(realLondonPrices, "records/Real_London_Average_House_Prices")
+	records, err = downloadCSVAndConvertToRecords(landRegistryURL("london"), 3, 6, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	records = interpolateRecords(records)
+	writeRecordsToCSV(records, "records/Nominal_London_Average_House_Prices")
+	records = adjustForInflation(records, UKCPIs)
+	writeRecordsToCSV(records, "records/Real_London_Average_House_Prices")
 
-	BOEBaseRates := scrapeBankOfEnglandRates()
-	BOEBaseRates = interpolateRecords(BOEBaseRates)
-	writeRecordsToCSV(BOEBaseRates, "records/BOEBaseRates")
+	records = scrapeBankOfEnglandRates()
+	records = interpolateRecords(records)
+	writeRecordsToCSV(records, "records/BOEBaseRates")
 }
 
 type Record struct {
@@ -136,11 +130,7 @@ func scrapeBankOfEnglandRates() []Record {
 	return records
 }
 
-func downloadCSV(URL string, filename string) {
-	file, err := os.Create(filename + ".csv")
-	if err != nil {
-		log.Fatal(err)
-	}
+func downloadCSVAndConvertToRecords(URL string, dateColumn int, valueColumn int, numHeaderRows int) ([]Record, error) {
 	client := http.Client{
 		CheckRedirect: func(r *http.Request, via []*http.Request) error {
 			r.URL.Opaque = r.URL.Path
@@ -152,17 +142,7 @@ func downloadCSV(URL string, filename string) {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	_, err = io.Copy(file, resp.Body)
-	defer file.Close()
-}
-
-func convertToRecords(filename string, dateColumn int, valueColumn int, numHeaderRows int) ([]Record, error) {
-	f, err := os.Open(filename + ".csv")
-	if err != nil {
-		return []Record{}, err
-	}
-	defer f.Close()
-	csvReader := csv.NewReader(f)
+	csvReader := csv.NewReader(resp.Body)
 	data, err := csvReader.ReadAll()
 	if err != nil {
 		return []Record{}, err
