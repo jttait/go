@@ -100,3 +100,5 @@ kernighan_and_donovan/ch10/ex10-2/archiver
 kernighan_and_donovan/ch10/jpeg/jpeg
 datasets/raw_data/*
 datasets/records/*
+datasets/go.sum
+datasets.go.mod
