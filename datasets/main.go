@@ -7,46 +7,133 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/jttait/go/datasets/dateparser"
 )
 
 func main() {
-	UKCPIURL := "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23"
-	downloadCSV(UKCPIURL, "raw_data/ONS_UK_Consumer_Price_Index")
-	UKCPIs := convertToRecords("raw_data/ONS_UK_Consumer_Price_Index", 0, 1, 186)
-	writeRecordsToCSV(UKCPIs, "records/UK_Consumer_Price_Index")
+	//UKCPIURL := "https://www.ons.gov.uk/generator?format=csv&uri=/economy/inflationandpriceindices/timeseries/l522/mm23"
+	//downloadCSV(UKCPIURL, "raw_data/ONS_UK_Consumer_Price_Index")
+	//UKCPIs, err := convertToRecords("raw_data/ONS_UK_Consumer_Price_Index", 0, 1, 186)
+	//if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	UKCPIs = interpolateRecords(UKCPIs)
+	//	writeRecordsToCSV(UKCPIs, "records/UK_Consumer_Price_Index")
 
-	downloadCSV(landRegistryURL("united-kingdom"), "raw_data/Land_Registry_Nominal_UK_Average_House_Prices")
-	nominalUKPrices := convertToRecords("raw_data/Land_Registry_Nominal_UK_Average_House_Prices", 3, 6, 1)
-	writeRecordsToCSV(nominalUKPrices, "records/Nominal_UK_Average_House_Prices")
-	realUKPrices := adjustForInflation(nominalUKPrices, UKCPIs)
-	writeRecordsToCSV(realUKPrices, "records/Real_UK_Average_House_Prices")
+	//downloadCSV(landRegistryURL("united-kingdom"), "raw_data/Land_Registry_Nominal_UK_Average_House_Prices")
+	//nominalUKPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_UK_Average_House_Prices", 3, 6, 1)
+	//if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	nominalUKPrices = interpolateRecords(nominalUKPrices)
+	//	writeRecordsToCSV(nominalUKPrices, "records/Nominal_UK_Average_House_Prices")
+	//	realUKPrices := adjustForInflation(nominalUKPrices, UKCPIs)
+	//	writeRecordsToCSV(realUKPrices, "records/Real_UK_Average_House_Prices")
 
-	downloadCSV(landRegistryURL("city-of-aberdeen"), "raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices")
-	nominalAberdeenPrices := convertToRecords("raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices", 3, 6, 1)
-	writeRecordsToCSV(nominalAberdeenPrices, "records/Nominal_Aberdeen_Average_House_Prices")
-	realAberdeenPrices := adjustForInflation(nominalAberdeenPrices, UKCPIs)
-	writeRecordsToCSV(realAberdeenPrices, "records/Real_Aberdeen_Average_House_Prices")
+	//downloadCSV(landRegistryURL("city-of-aberdeen"), "raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices")
+	//nominalAberdeenPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_Aberdeen_Average_House_Prices", 3, 6, 1)
+	//if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	nominalAberdeenPrices = interpolateRecords(nominalAberdeenPrices)
+	//	writeRecordsToCSV(nominalAberdeenPrices, "records/Nominal_Aberdeen_Average_House_Prices")
+	//	realAberdeenPrices := adjustForInflation(nominalAberdeenPrices, UKCPIs)
+	//	writeRecordsToCSV(realAberdeenPrices, "records/Real_Aberdeen_Average_House_Prices")
 
-	downloadCSV(landRegistryURL("shetland-islands"), "raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices")
-	nominalShetlandPrices := convertToRecords("raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices", 3, 6, 1)
-	writeRecordsToCSV(nominalShetlandPrices, "records/Nominal_Shetland_Average_House_Prices")
-	realShetlandPrices := adjustForInflation(nominalShetlandPrices, UKCPIs)
-	writeRecordsToCSV(realShetlandPrices, "records/Real_Shetland_Average_House_Prices")
+	//	downloadCSV(landRegistryURL("shetland-islands"), "raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices")
+	//	nominalShetlandPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_Shetland_Average_House_Prices", 3, 6, 1)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	nominalShetlandPrices = interpolateRecords(nominalShetlandPrices)
+	//	writeRecordsToCSV(nominalShetlandPrices, "records/Nominal_Shetland_Average_House_Prices")
+	//	realShetlandPrices := adjustForInflation(nominalShetlandPrices, UKCPIs)
+	//	writeRecordsToCSV(realShetlandPrices, "records/Real_Shetland_Average_House_Prices")
 
-	downloadCSV(landRegistryURL("london"), "raw_data/Land_Registry_Nominal_London_Average_House_Prices")
-	nominalLondonPrices := convertToRecords("raw_data/Land_Registry_Nominal_London_Average_House_Prices", 3, 6, 1)
-	writeRecordsToCSV(nominalLondonPrices, "records/Nominal_London_Average_House_Prices")
-	realLondonPrices := adjustForInflation(nominalLondonPrices, UKCPIs)
-	writeRecordsToCSV(realLondonPrices, "records/Real_London_Average_House_Prices")
+	//	downloadCSV(landRegistryURL("london"), "raw_data/Land_Registry_Nominal_London_Average_House_Prices")
+	//	nominalLondonPrices, err := convertToRecords("raw_data/Land_Registry_Nominal_London_Average_House_Prices", 3, 6, 1)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//	nominalLondonPrices = interpolateRecords(nominalLondonPrices)
+	//	writeRecordsToCSV(nominalLondonPrices, "records/Nominal_London_Average_House_Prices")
+	//	realLondonPrices := adjustForInflation(nominalLondonPrices, UKCPIs)
+	//	writeRecordsToCSV(realLondonPrices, "records/Real_London_Average_House_Prices")
+
+	BOEBaseRates := scrapeBankOfEnglandRates()
+	BOEBaseRates = interpolateRecords(BOEBaseRates)
+	writeRecordsToCSV(BOEBaseRates, "records/BOEBaseRates")
 }
 
 type Record struct {
 	Date  time.Time
 	Value float64
+}
+
+type ByDate []Record
+
+func (a ByDate) Len() int           { return len(a) }
+func (a ByDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDate) Less(i, j int) bool { return a[i].Date.Before(a[j].Date) }
+
+func interpolateRecords(records []Record) []Record {
+	sort.Sort(ByDate(records))
+	var interpolatedRecords []Record
+	for i := 0; i < len(records)-1; i++ {
+		date := records[i].Date
+		value := records[i].Value
+		nextDate := records[i+1].Date
+		for date.Before(nextDate) {
+			interpolatedRecords = append(interpolatedRecords, Record{date, value})
+			date = date.AddDate(0, 0, 1)
+		}
+	}
+	return interpolatedRecords
+}
+
+func scrapeBankOfEnglandRates() []Record {
+	resp, err := http.Get("https://www.bankofengland.co.uk/boeapps/database/Bank-Rate.asp#")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		log.Fatalf("Status code error: %d %s\n", resp.StatusCode, resp.Status)
+	}
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var records []Record
+	doc.Find("#stats-table").Find("tbody").Find("tr").Each(func(i int, s *goquery.Selection) {
+		var record Record
+		s.Find("td").Each(func(j int, q *goquery.Selection) {
+			align, _ := q.Attr("align")
+			if align == "left" {
+				date, err := dateparser.ParseDate(q.Text())
+				if err != nil {
+					log.Fatal(err)
+				}
+				record.Date = date
+			} else if align == "right" {
+				trimmed := strings.TrimSpace(q.Text())
+				num, err := strconv.ParseFloat(trimmed, 64)
+				if err != nil {
+					log.Fatal(err)
+				}
+				record.Value = num
+			}
+		})
+		records = append(records, record)
+	})
+	return records
 }
 
 func downloadCSV(URL string, filename string) {
@@ -69,40 +156,30 @@ func downloadCSV(URL string, filename string) {
 	defer file.Close()
 }
 
-func convertToRecords(filename string, dateColumn int, valueColumn int, numHeaderRows int) []Record {
+func convertToRecords(filename string, dateColumn int, valueColumn int, numHeaderRows int) ([]Record, error) {
 	f, err := os.Open(filename + ".csv")
 	if err != nil {
-		log.Fatal(err)
+		return []Record{}, err
 	}
 	defer f.Close()
 	csvReader := csv.NewReader(f)
 	data, err := csvReader.ReadAll()
 	if err != nil {
-		log.Fatal(err)
+		return []Record{}, err
 	}
 	var records []Record
 	for i := numHeaderRows; i < len(data); i++ {
-		var start time.Time
-		var num float64
-		for j, field := range data[i] {
-			if j == dateColumn {
-				start, err = dateparser.ParseDate(field)
-				if err != nil {
-					log.Fatal(err)
-				}
-			} else if j == valueColumn {
-				num, err = strconv.ParseFloat(field, 64)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
+		date, err := dateparser.ParseDate(data[i][dateColumn])
+		if err != nil {
+			return records, err
 		}
-		for d := start; d.Month() == start.Month(); d = d.AddDate(0, 0, 1) {
-			record := Record{d, num}
-			records = append(records, record)
+		value, err := strconv.ParseFloat(data[i][valueColumn], 64)
+		if err != nil {
+			return records, err
 		}
+		records = append(records, Record{date, value})
 	}
-	return records
+	return records, nil
 }
 
 func writeRecordsToCSV(records []Record, filename string) {

@@ -6,17 +6,25 @@ import (
 )
 
 func TestShouldMatchYYYYdashMM(t *testing.T) {
-	want := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
-	result, err := ParseDate("2000-01")
+	want := time.Date(2005, time.March, 1, 0, 0, 0, 0, time.UTC)
+	result, err := ParseDate("2005-03")
 	if want != result || err != nil {
 		t.Fatalf("Want: %v. Got: %v", want, result)
 	}
 }
 
 func TestShouldMatchYYYYspaceMMM(t *testing.T) {
-	want := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
-	result, err := ParseDate("2000 JAN")
+	want := time.Date(2005, time.March, 1, 0, 0, 0, 0, time.UTC)
+	result, err := ParseDate("2005 MAR")
 	if want != result || err != nil {
 		t.Fatalf("Want: %v. Got: %v", want, result)
+	}
+}
+
+func TestShouldMatchDDspaceMMMspaceYY(t *testing.T) {
+	want := time.Date(2005, time.March, 4, 0, 0, 0, 0, time.UTC)
+	result, err := ParseDate("04 Mar 05")
+	if want != result || err != nil {
+		t.Fatalf("Want: %v. Got: %v. Err: %v", want, result, err)
 	}
 }
